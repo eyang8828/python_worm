@@ -43,9 +43,9 @@ def markInfected():
 	p = os.path.join(os.path.abspath('.'),'tmp')
 	try:
 		os.mkdir(p)
-		open(os.path.join(p,"infected.txt","w"))
+		open(os.path.join(p,"infected.txt"),"w")
 	except FileExistsError as e:
-		open(os.path.join(p,"infected.txt","w"))
+		open(os.path.join(p,"infected.txt"),"w")
 ###############################################################
 # Spread to the other system and execute
 # @param sshClient - the instance of the SSH client connected
