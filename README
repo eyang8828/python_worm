@@ -1,0 +1,6 @@
+Goal : the goal of this program is to create a program using Python to infect other machine on the same GNS3 network.
+The way to run this code : Python3 worm.py
+Git repo : Git@github.com/eyang8828/Python_Worm
+participant : 	Eddie Yang ( 887353134 )
+		Jeffrey Nong ( 888531555 )
+There were no optional goals completed is this repo. ( clean and spread to adjacent network )
